@@ -51,3 +51,23 @@ select cores_id, frutas_id from cores_frutas cf;
 
 
 
+create table clientes (
+	id int,
+	nome varchar(50),
+	primary key(id)
+);
+
+CREATE TABLE pedidos (
+	id int,
+	clientes_id int,
+	data_pedido date,
+	primary key(id),
+	constraint fk_pedidos_clientes
+		FOREIGN key(clientes_id)
+		REFERENCES clientes(id)
+);
+
+
+
+
+
