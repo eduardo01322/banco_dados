@@ -47,7 +47,7 @@ create table notas (
 	
 create table alunos_disciplinas (
 	alunos_id int not null,
-	disciplinas_id int not null,
+	disciplinas_id int,
 	primary key (alunos_id, disciplinas_id),
 	constraint fk_alunos_disciplinas
 		foreign key (alunos_id)
@@ -138,6 +138,10 @@ INSERT INTO disciplinas (nome, professores_id)
 	VALUES ('geografia', 5);
 INSERT INTO disciplinas (nome) 
 	VALUES ('senai');
+INSERT INTO disciplinas (nome, professores_id) 
+	VALUES ('quimica', 4);
+INSERT INTO disciplinas (nome, professores_id) 
+	VALUES ('biologia', 4);
 	
 select id, nome, professores_id from  disciplinas d;
 
@@ -190,11 +194,37 @@ INSERT INTO notas (nota, disciplinas_id, alunos_id)
 INSERT INTO notas (nota, disciplinas_id, alunos_id) 
 	VALUES (2.22, 4, 1);
 INSERT INTO notas (nota, disciplinas_id, alunos_id) 
+	VALUES (2.22, 4, 2);
+INSERT INTO notas (nota, disciplinas_id, alunos_id) 
 	VALUES (2.22, 3, 1);
 INSERT INTO notas (nota, disciplinas_id, alunos_id) 
 	VALUES (2.22, 2, 1);
 INSERT INTO notas (nota, disciplinas_id, alunos_id) 
 	VALUES (2.22, 1, 1);
+INSERT INTO notas (nota, disciplinas_id, alunos_id) 
+	VALUES (8.22, 3, 2);
+INSERT INTO notas (nota, disciplinas_id, alunos_id) 
+	VALUES (2.22, 3, 1);
+INSERT INTO notas (nota, disciplinas_id, alunos_id) 
+	VALUES (8.22, 7, 1);
+INSERT INTO notas (nota, disciplinas_id, alunos_id) 
+	VALUES (2.22, 7, 2);
+INSERT INTO notas (nota, disciplinas_id, alunos_id) 
+	VALUES (2.22, 8, 1);
+INSERT INTO notas (nota, disciplinas_id, alunos_id) 
+	VALUES (4.22, 8, 2);
+INSERT INTO notas (nota, disciplinas_id, alunos_id) 
+	VALUES (4.00, 5, 1);
+INSERT INTO notas (nota, disciplinas_id, alunos_id) 
+	VALUES (8.22, 3, 2);
+INSERT INTO notas (nota, disciplinas_id, alunos_id) 
+	VALUES (0.22, 3, 2);
+INSERT INTO notas (nota, disciplinas_id, alunos_id) 
+	VALUES (1.22, 3, 2);
+INSERT INTO notas (nota, disciplinas_id, alunos_id) 
+	VALUES (1.22, 7, 3);
+INSERT INTO notas (nota, disciplinas_id, alunos_id) 
+	VALUES (6.22, 7, 4);
 
 select id, nota, disciplinas_id, alunos_id from notas n;
 
@@ -269,7 +299,7 @@ select a.id, a.nome, d.nome, n.nota
 	where d.nome = 'matematica' and n.nota > 7;
 	
 
-/*EX:8 notas inferior a 7 em uma determinada disciplina*/
+/*EX:8 notas inferior a 7*/
 select a.id, a.nome, d.nome, n.nota 
 	from alunos a 
 	inner join alunos_disciplinas ad on a.id = ad.alunos_id  
@@ -313,3 +343,148 @@ select a.id, a.nome, d.nome, p.nome, p.grau_academico
 select d.id, d.nome, p.nome   
 	from  disciplinas d left join professores p on d.id = p.id 
 	where d.professores_id is null;
+
+
+/*EX:14 total de alunos matriculados na disciplina de Matemática*/
+select count(ad.disciplinas_id) 
+	from alunos_disciplinas ad  
+	inner join disciplinas d on ad.disciplinas_id = d.id 
+	where d.nome = 'matematica';
+
+
+/*EX:15 soma total das notas dos alunos na disciplina de Física*/
+select sum(nota) as soma from notas n 
+	inner join disciplinas d on n.disciplinas_id = d.id 
+	where d.nome = 'fisica';
+
+
+/*EX:16 maior nota alcançada por um aluno na disciplina de História.*/
+select max(nota) as maior_valor from notas n 
+	inner join disciplinas d on n.disciplinas_id = d.id 
+	where d.nome = 'historia';
+
+
+/*EX:17  menor nota obtida por um aluno na disciplina de Química*/
+select min(nota) as menor_valor from notas n
+	inner join disciplinas d on n.disciplinas_id = d.id 
+	where d.nome = 'quimica';
+
+
+/*EX:18  média das notas dos alunos na disciplina de Biologia.*/
+select avg(nota) as preco_medio from notas n 
+	inner join disciplinas d on n.disciplinas_id = d.id 
+	where d.nome = 'biologia';
+
+
+/*EX:19 Conte quantos alunos estão matriculados em cada disciplina*/
+select  d.nome, count(alunos_id) as matriculados_disciplina
+from notas n 
+inner join disciplinas d on n.disciplinas_id = d.id 
+group by n.disciplinas_id 
+having count(alunos_id);
+
+
+/*EX:20 Calcule a soma total das notas de todos os alunos em todas as disciplinas*/
+select sum(nota) as total from notas n;
+
+
+/*EX:21 Determine a maior nota entre todos os alunos em todas as disciplinas.*/
+select max(nota) as maior_valor from notas n;
+
+
+/*EX:22 Descubra a menor nota entre todos os alunos em todas as disciplinas*/
+select min(nota) as menor_valor from notas n;
+
+
+/*EX:23  Calcule a média das notas de todos os alunos em todas as disciplinas.*/
+select avg(nota) as media from notas n;
+
+
+/*EX:24  Liste todas as disciplinas e a média das notas de cada disciplina.*/
+select d.nome, avg(n.nota) as media_disciplina from notas n
+	inner join disciplinas d on n.disciplinas_id = d.id 
+	group by n.disciplinas_id  
+	having avg(n.nota);
+
+
+/*EX:25  Liste a disciplinas, alunos e a média, realize a ordenação de disciplina e aluno por 
+ordem crescente.*/
+select d.nome, a.nome, avg(n.nota) as media_disciplina from notas n 
+	inner join disciplinas d on n.disciplinas_id = d.id 
+	inner join alunos a on n.alunos_id = a.id 
+	group by n.disciplinas_id, n.alunos_id  
+	having avg(n.nota) 
+	order by d.nome, a.nome asc;
+
+
+/*EX:26  Liste a disciplinas, alunos e a média, realize a ordenação de disciplina por ordem 
+crescente e a média em ordem decrescente*/
+select d.nome, a.nome, avg(n.nota) as media_disciplina from notas n 
+	inner join disciplinas d on n.disciplinas_id = d.id 
+	inner join alunos a on n.alunos_id = a.id 
+	group by n.disciplinas_id, n.alunos_id  
+	having avg(n.nota) 
+	order by d.nome asc, n.nota desc;
+
+
+/*EX:27  5 menores notas da disciplina de História, exibir o nome do aluno e a nota*/
+select a.nome, n.nota from notas n 
+	inner join disciplinas d on n.disciplinas_id = d.id 
+	inner join alunos a on n.alunos_id = a.id
+	where d.nome = 'historia'
+	order by n.nota asc limit 5;
+
+
+/*EX:28 */
+select d.nome, a.nome, avg(n.nota) as media_disciplina from notas n 
+	inner join disciplinas d on n.disciplinas_id = d.id 
+	inner join alunos a on n.alunos_id = a.id
+	where d.nome = 'quimica'
+	group by n.disciplinas_id, n.alunos_id  
+	having avg(n.nota) 
+	order by n.nota desc limit 3;
+
+
+/*EX:29 Liste as 10 maiores médias, exibir nome da disciplina, nome do aluno e a média*/
+select d.nome, a.nome, avg(n.nota) as media_disciplina from notas n 
+	inner join disciplinas d on n.disciplinas_id = d.id 
+	inner join alunos a on n.alunos_id = a.id
+	group by n.disciplinas_id, n.alunos_id  
+	having avg(n.nota) 
+	order by n.nota desc limit 10;
+
+
+/*EX:30 Conte quantos alunos ativos tem cadastrado na escola. Para saber se o aluno esta 
+ativo ele deve estar matriculado em alguma disciplina caso o aluno não esteja 
+matricula em uma disciplina ele é considerado inativo*/
+
+select count(alunos_id) as quatidade_Alunos
+from alunos_disciplinas ad  
+where disciplinas_id is not null
+having count(alunos_id);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
